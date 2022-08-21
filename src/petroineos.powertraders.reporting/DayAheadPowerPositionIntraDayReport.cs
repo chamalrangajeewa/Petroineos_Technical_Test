@@ -1,6 +1,7 @@
 ﻿namespace petroineos.powertraders.reporting
 {
     using CsvHelper;
+    using CsvHelper.Configuration;
     using Microsoft.Extensions.Logging;
     using Services;
     using System.Collections.ObjectModel;
@@ -8,6 +9,12 @@
 
     public class DayAheadPowerPositionIntraDayReport : IReport
     {
+        private readonly static CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            LeaveOpen = true,
+            NewLine = Environment.NewLine,
+        };
+
         private readonly static Dictionary<int, string> hourMapping = new Dictionary<int, string>()
         {
             {1,"23:00"},
@@ -41,15 +48,19 @@
 
         public DayAheadPowerPositionIntraDayReport(
             IPowerService powerService,
+
             ILogger<DayAheadPowerPositionIntraDayReport> logger)
         {
             _logger = logger;
             _powerService = powerService;
         }
 
-        public async Task Generate()
+        public async Task GenerateAsync(CancellationToken stoppingToken)
         {
-            var powerTrades = await _powerService.GetTradesAsync(DateTime.Today); //This method should have cancellation Token input
+            var ukTimeZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+            DateTime londonLocalTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, ukTimeZone);
+
+            var powerTrades = await _powerService.GetTradesAsync(londonLocalTime.Date); //This method should have cancellation Token input
 
             var aggregatedPowerPeriods = from powerTrade in powerTrades
                                          from period in powerTrade.Periods
@@ -60,28 +71,32 @@
                                              Volume = g.Sum(p => p.Volume),
                                          };
 
-            string fileName = $"PowerPosition_YYYYMMDD_HHMM.csv";
-            await Task.CompletedTask;
+            string fileName = $"PowerPosition_{londonLocalTime.Date:yyyyMMdd}_{londonLocalTime:HHMM}.csv";
+            string folderPath = "D:\\cimplex\\";
+            string fullyQualifiedFilePath = Path.Combine(folderPath, fileName);
+
+            WriteRecordsToCsv(aggregatedPowerPeriods, fullyQualifiedFilePath);
         }
 
-        private Stream WriteRecordsToCsv(IEnumerable<LineEntry> records)
-        {
-            MemoryStream resultToReturn = new MemoryStream();
-
-            using (var writer = new StreamWriter(resultToReturn, leaveOpen: true))
-            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, true))
+        private void WriteRecordsToCsv(IEnumerable<PowerPeriod> records, string fileNameWithFolderPath)
+        {             
+            using (var writer = new StreamWriter(fileNameWithFolderPath))
+            using (var csv = new CsvWriter(writer, csvConfig))
             {
                 csv.Context.RegisterClassMap<LineEntryMap>();
                 csv.WriteHeader<LineEntry>();
                 csv.NextRecord();
                 foreach (var record in records)
                 {
-                    csv.WriteRecord(record);
+                    csv.WriteRecord(new LineEntry() 
+                    {
+                        Volume = record.Volume.ToString(),
+                        LocalTime = hourMapping[record.Period]
+                    });
+
                     csv.NextRecord();
                 }
             }
-
-            return resultToReturn;
         }
     }
 }

@@ -1,6 +1,7 @@
 namespace petroineos.powertraders.reporting.windowsserviceapp
 {
     using Microsoft.Extensions.Hosting;
+    using Services;
 
     public class Program
     {
@@ -12,9 +13,24 @@ namespace petroineos.powertraders.reporting.windowsserviceapp
                 {
                     options.ServiceName = "Intra-day reporting service";
                 })
-                .ConfigureServices(services =>
+                .ConfigureServices((ctx,services) =>
                 {
+                    //var gggg = services.Configuration;
                     services.AddHostedService<WindowsBackgroundService>();
+                    services.AddOptions<Configs>()
+                    .Configure((a) =>
+                    {
+                        var config = ctx.Configuration;
+                        string targetFilePath = config.GetRequiredSection("TargetFilePath").Get<string>();
+                        int intervalInSeconds = config.GetRequiredSection("IntervalInSeconds").Get<int>();
+                        a.FolderPath = targetFilePath;
+                        a.IntervalInSeconds = intervalInSeconds;
+                    });
+
+                    services.AddLogging();
+                   
+                    services.AddTransient<IPowerService, PowerService>();
+                    services.AddTransient<IReport, DayAheadPowerPositionIntraDayReport>();
                 })
                 .ConfigureLogging((context, logging) =>
                 {

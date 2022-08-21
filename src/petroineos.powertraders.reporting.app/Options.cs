@@ -7,13 +7,13 @@
     {
         public class Options
         {
-            [Option(shortName: 'f', longName: "filename", Required = true, HelpText = "The filename to use when uploading the transformed result")]
-            public string TargetFileName { get; set; }
+            [Option(shortName: 'f', longName: "folderpath", Required = true, HelpText = "The folderpath where file generated will be saved")]
+            public string FolderPath { get; set; }
 
-            [Option(shortName: 'u', longName: "url", Required = true, HelpText = "The url of the input catalogue feed")]
-            public Uri FeedUrl { get; set; }
+            [Option(shortName: 'i', longName: "interval", Required = true, HelpText = "The schedule Interval")]
+            public int IntervalInSeconds { get; set; }
 
-            [Usage(ApplicationAlias = "preezie.catalog.importer.app.exe")]
+            [Usage(ApplicationAlias = "petroineos.powertraders.reporting.app.exe")]
             public static IEnumerable<Example> Examples
             {
                 get
@@ -21,11 +21,11 @@
                     return new List<Example>()
                     {
                         new Example(
-                            "Tranform the puma feed given on the url to an one that is compatible with preezie data import ( REMEMBER TO ESCAPE SPECIAL CHARACTERS )",
+                            "Generate intra day report for day ahead power position. The reported is generate with the interval given.",
                             new Options
                             {
-                                TargetFileName = "puma_products.csv",
-                                FeedUrl = new Uri("https://au.puma.com/pub/media/feeds/preezie_feed.xml")
+                                FolderPath = "D:\\cimplex\\",
+                                IntervalInSeconds = 300
                             })
                     };
                 }

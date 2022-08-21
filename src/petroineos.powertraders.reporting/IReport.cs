@@ -2,6 +2,6 @@
 {
     public interface IReport
     {
-        Task Generate();
+        Task GenerateAsync(CancellationToken cancellationToken = default);
     }
 }

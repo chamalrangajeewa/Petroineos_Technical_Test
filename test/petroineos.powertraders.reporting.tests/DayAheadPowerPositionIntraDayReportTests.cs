@@ -11,7 +11,6 @@
     public class DayAheadPowerPositionIntraDayReportTests
     {
         private MockRepository mockRepository;
-
         private Mock<IPowerService> mockPowerService;
         private Mock<ILogger<DayAheadPowerPositionIntraDayReport>> mockLogger;
 
@@ -21,6 +20,23 @@
 
             this.mockPowerService = this.mockRepository.Create<IPowerService>();
             this.mockLogger = this.mockRepository.Create<ILogger<DayAheadPowerPositionIntraDayReport>>();
+
+            var powerTrade1 = PowerTrade.Create(DateTime.Today, 24);
+            var powerTrade2 = PowerTrade.Create(DateTime.Today, 24);
+            var powerTrade3 = PowerTrade.Create(DateTime.Today, 24);
+
+            powerTrade1.Periods.ToList().ForEach(a => a.Volume = 10);
+            powerTrade2.Periods.ToList().ForEach(a => a.Volume = 20);
+            powerTrade3.Periods.ToList().ForEach(a => a.Volume = 30);
+
+            this.mockPowerService
+                .Setup(o => o.GetTradesAsync(It.IsAny<DateTime>()))
+                .ReturnsAsync(new List<PowerTrade>() 
+                {
+                    powerTrade1,
+                    powerTrade2,
+                    powerTrade3
+                });
         }
 
         private DayAheadPowerPositionIntraDayReport CreateDayAheadPowerPositionIntraDayReport()
@@ -37,7 +53,7 @@
             var dayAheadPowerPositionIntraDayReport = this.CreateDayAheadPowerPositionIntraDayReport();
 
             // Act
-            await dayAheadPowerPositionIntraDayReport.Generate();
+            await dayAheadPowerPositionIntraDayReport.GenerateAsync(default);
 
             // Assert
             Assert.True(false);

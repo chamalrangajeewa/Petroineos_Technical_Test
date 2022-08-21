@@ -1,7 +1,5 @@
 ﻿namespace petroineos.powertraders.reporting
 {
-    //using Azure;
-    //using Azure.Storage.Blobs;
     using CommandLine;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -13,42 +11,25 @@
         static void Main(string[] args)
         {            
             var result = Parser.Default.ParseArguments<Options>(args);
+
             result.WithParsedAsync(o =>
             {
                 Console.WriteLine("Building Host....");
                 IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureServices(services =>
-                {
-                    services.AddHttpClient<Worker>(
-                    client =>
+                { 
+                    services.AddOptions<Configs>().Configure((a) =>
                     {
-                        client.Timeout = new TimeSpan(0, 20, 0);
+                        a.FolderPath = result.Value.FolderPath;
+                        a.IntervalInSeconds = result.Value.IntervalInSeconds;
                     });
-
-                    //services.AddOptions<CatalogueFeedData>().Configure((a) =>
-                    //{
-                    //    a.FeedUrl = result.Value.FeedUrl;
-                    //    a.TargetFileName = result.Value.TargetFileName;
-                    //});
 
                     services.AddLogging();
                     services.AddHostedService<Worker>();
 
-
                     services.AddTransient<IPowerService, PowerService>();
-                    //services.AddTransient<BlobContainerClient>(o =>
-                    //{
-                    //    var config = o.GetRequiredService<IConfiguration>();
-                    //    string storageAccountName = config.GetRequiredSection("StorageAccount:Name").Get<string>();
-                    //    string blobContainerUri = config.GetRequiredSection("StorageAccount:BlobContainerUri").Get<string>();
-                    //    string sasToken = config.GetRequiredSection("StorageAccount:SasToken").Get<string>();
+                    services.AddTransient<IReport, DayAheadPowerPositionIntraDayReport>();
 
-                    //    return new BlobContainerClient
-                    //    (
-                    //        new Uri(blobContainerUri),
-                    //        new AzureSasCredential(sasToken)
-                    //    );
-                    //});
                 })
                 .Build();
 

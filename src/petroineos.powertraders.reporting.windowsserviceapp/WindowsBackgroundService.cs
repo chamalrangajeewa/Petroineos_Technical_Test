@@ -1,12 +1,21 @@
+using Microsoft.Extensions.Options;
+
 namespace petroineos.powertraders.reporting.windowsserviceapp
 {
     public sealed class WindowsBackgroundService : BackgroundService
     {
+        private readonly IReport _report;
         private readonly ILogger<WindowsBackgroundService> _logger;
+        private readonly IOptions<Configs> _configs;
 
-        public WindowsBackgroundService(ILogger<WindowsBackgroundService> logger)
+        public WindowsBackgroundService(
+            IReport report,
+            IOptions<Configs> configs,
+            ILogger<WindowsBackgroundService> logger)
         {
+            _report = report;
             _logger = logger;
+            _configs = configs;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -14,8 +23,9 @@ namespace petroineos.powertraders.reporting.windowsserviceapp
             try
             {
                 while (!stoppingToken.IsCancellationRequested)
-                {            
-                    await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                {
+                    await _report.GenerateAsync(stoppingToken);
+                    await Task.Delay(TimeSpan.FromSeconds(_configs.Value.IntervalInSeconds), stoppingToken);
                 }
             }
             catch (Exception ex)
