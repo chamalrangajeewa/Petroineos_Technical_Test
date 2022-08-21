@@ -15,7 +15,6 @@ namespace petroineos.powertraders.reporting.windowsserviceapp
                 })
                 .ConfigureServices((ctx,services) =>
                 {
-                    //var gggg = services.Configuration;
                     services.AddHostedService<WindowsBackgroundService>();
                     services.AddOptions<Configs>()
                     .Configure((a) =>
@@ -27,8 +26,7 @@ namespace petroineos.powertraders.reporting.windowsserviceapp
                         a.IntervalInSeconds = intervalInSeconds;
                     });
 
-                    services.AddLogging();
-                   
+                    services.AddLogging();                   
                     services.AddTransient<IPowerService, PowerService>();
                     services.AddTransient<IReport, DayAheadPowerPositionIntraDayReport>();
                 })

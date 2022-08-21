@@ -27,19 +27,8 @@ namespace petroineos.powertraders.reporting
         {
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
 
-            try
-            {
-                while (!stoppingToken.IsCancellationRequested)
-                {
-                    await _report.GenerateAsync(stoppingToken);
-                    await Task.Delay(TimeSpan.FromSeconds(_configs.Value.IntervalInSeconds), stoppingToken);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "{Message}", ex.Message);
-                Environment.Exit(1);
-            }
+            bool folderExist = Directory.Exists(_configs.Value.FolderPath);
+            if (!folderExist) Directory.CreateDirectory(_configs.Value.FolderPath);
 
             try
             {

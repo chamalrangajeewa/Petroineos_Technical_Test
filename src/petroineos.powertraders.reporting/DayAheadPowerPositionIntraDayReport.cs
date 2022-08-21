@@ -3,8 +3,8 @@
     using CsvHelper;
     using CsvHelper.Configuration;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
     using Services;
-    using System.Collections.ObjectModel;
     using System.Globalization;
 
     public class DayAheadPowerPositionIntraDayReport : IReport
@@ -45,18 +45,21 @@
 
         private readonly ILogger<DayAheadPowerPositionIntraDayReport> _logger;
         private readonly IPowerService _powerService;
+        private readonly IOptions<Configs> _configs;
 
         public DayAheadPowerPositionIntraDayReport(
             IPowerService powerService,
-
+            IOptions<Configs> configs,
             ILogger<DayAheadPowerPositionIntraDayReport> logger)
         {
             _logger = logger;
             _powerService = powerService;
+            _configs = configs;
         }
 
         public async Task GenerateAsync(CancellationToken stoppingToken)
         {
+            _logger.LogInformation("started generating report");
             var ukTimeZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             DateTime londonLocalTime = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, ukTimeZone);
 
@@ -72,14 +75,21 @@
                                          };
 
             string fileName = $"PowerPosition_{londonLocalTime.Date:yyyyMMdd}_{londonLocalTime:HHMM}.csv";
-            string folderPath = "D:\\cimplex\\";
-            string fullyQualifiedFilePath = Path.Combine(folderPath, fileName);
+            string fullyQualifiedFilePath = Path.Combine(_configs.Value.FolderPath, fileName);
+
+            if (File.Exists(fullyQualifiedFilePath))
+            {
+                _logger.LogWarning("report file {0} already exist. skipping..", fullyQualifiedFilePath);
+            }
 
             WriteRecordsToCsv(aggregatedPowerPeriods, fullyQualifiedFilePath);
+            _logger.LogInformation("Generating report complete");
+            _logger.LogInformation("report generated at {0}", fullyQualifiedFilePath);
         }
 
         private void WriteRecordsToCsv(IEnumerable<PowerPeriod> records, string fileNameWithFolderPath)
-        {             
+        {
+            _logger.LogInformation("writting {0} records to file", records.Count());
             using (var writer = new StreamWriter(fileNameWithFolderPath))
             using (var csv = new CsvWriter(writer, csvConfig))
             {
@@ -88,6 +98,7 @@
                 csv.NextRecord();
                 foreach (var record in records)
                 {
+                    _logger.LogInformation("writting power period entry period:{0} volume:{1}", record.Period, record.Volume);
                     csv.WriteRecord(new LineEntry() 
                     {
                         Volume = record.Volume.ToString(),

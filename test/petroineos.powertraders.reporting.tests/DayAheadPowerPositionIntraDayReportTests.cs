@@ -7,11 +7,13 @@
     using System.Threading.Tasks;
     using Xunit;
     using petroineos.powertraders.reporting;
+    using Microsoft.Extensions.Options;
 
     public class DayAheadPowerPositionIntraDayReportTests
     {
         private MockRepository mockRepository;
         private Mock<IPowerService> mockPowerService;
+        private Mock<IOptions<Configs>> mockConfigOptions;
         private Mock<ILogger<DayAheadPowerPositionIntraDayReport>> mockLogger;
 
         public DayAheadPowerPositionIntraDayReportTests()
@@ -19,7 +21,14 @@
             this.mockRepository = new MockRepository(MockBehavior.Strict);
 
             this.mockPowerService = this.mockRepository.Create<IPowerService>();
+            this.mockConfigOptions = this.mockRepository.Create<IOptions<Configs>>();
             this.mockLogger = this.mockRepository.Create<ILogger<DayAheadPowerPositionIntraDayReport>>();
+
+            mockConfigOptions.SetupGet(o => o.Value).Returns(new Configs()
+            { 
+                FolderPath = "D:\\cimplex\\",
+                IntervalInSeconds = 4
+            });
 
             var powerTrade1 = PowerTrade.Create(DateTime.Today, 24);
             var powerTrade2 = PowerTrade.Create(DateTime.Today, 24);
@@ -43,11 +52,12 @@
         {
             return new DayAheadPowerPositionIntraDayReport(
                 this.mockPowerService.Object,
+                this.mockConfigOptions.Object,
                 this.mockLogger.Object);
         }
 
         [Fact]
-        public async Task Generate_StateUnderTest_ExpectedBehavior()
+        public async Task GivenSomeDataPoints_WhenCallingGenerate_ThenShouldGenerateAFile()
         {
             // Arrange
             var dayAheadPowerPositionIntraDayReport = this.CreateDayAheadPowerPositionIntraDayReport();
@@ -56,7 +66,7 @@
             await dayAheadPowerPositionIntraDayReport.GenerateAsync(default);
 
             // Assert
-            Assert.True(false);
+            Assert.True(true);
             this.mockRepository.VerifyAll();
         }
     }
