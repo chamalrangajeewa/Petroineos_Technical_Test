@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{465B276F-F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "petroineos.powertraders.reporting.app", "src\petroineos.powertraders.reporting.app\petroineos.powertraders.reporting.app.csproj", "{F060A215-8D71-4611-8F39-B52917C8F627}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "petroineos.powertraders.reporting", "src\petroineos.powertraders.reporting\petroineos.powertraders.reporting.csproj", "{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "petroineos.powertraders.reporting", "src\petroineos.powertraders.reporting\petroineos.powertraders.reporting.csproj", "{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "petroineos.powertraders.reporting.windowsserviceapp", "src\petroineos.powertraders.reporting.windowsserviceapp\petroineos.powertraders.reporting.windowsserviceapp.csproj", "{1FCAF068-16C5-4ECF-8901-23D39FBBE03C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,10 @@ Global
 		{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FCAF068-16C5-4ECF-8901-23D39FBBE03C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FCAF068-16C5-4ECF-8901-23D39FBBE03C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FCAF068-16C5-4ECF-8901-23D39FBBE03C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FCAF068-16C5-4ECF-8901-23D39FBBE03C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{F060A215-8D71-4611-8F39-B52917C8F627} = {013EDD1F-ADC0-47C1-94EF-17B76328E969}
 		{9B9CF953-9B71-4AE7-A015-15F9C87CE7F9} = {013EDD1F-ADC0-47C1-94EF-17B76328E969}
+		{1FCAF068-16C5-4ECF-8901-23D39FBBE03C} = {013EDD1F-ADC0-47C1-94EF-17B76328E969}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0F376260-BC94-4F0D-8D8D-C5108CB34983}
