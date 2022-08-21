@@ -31,17 +31,7 @@ namespace petroineos.powertraders.reporting
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-            var powerTrades =  await _powerService.GetTradesAsync(DateTime.Today); //This method should have cancellation Token input
-
-            var aggregatedPowerPeriods = from powerTrade in powerTrades
-                                         from period in powerTrade.Periods
-                                         group period by period.Period into g
-                                         select new PowerPeriod()
-                                         {
-                                             Period = g.Key,
-                                             Volume = g.Sum(p => p.Volume),
-                                         };
-
+            
             //string fileName = _catalogueFeedData.Value.TargetFileName ?? $"{DateTime.Today.ToString("MM_dd_yyyy")}-{Guid.NewGuid()}.csv";
 
             //_logger.LogInformation("Downloading catalogue feed from url : {0}", _catalogueFeedData.Value.FeedUrl);
